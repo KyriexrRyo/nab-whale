@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ player.name_jp }} - 詳細</title>
+</head>
+<body style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: sans-serif; background: linear-gradient(135deg, {{ player.team.color_primary }}, {{ player.team.color_secondary }}); min-height: 100vh;">
+
+    <a href="{% url 'player_list' %}" style="text-decoration: none; display: inline-block; margin-bottom: 20px; color: white; font-weight: bold; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 20px;">&larr; 一覧に戻る</a>
+
+    <h1 style="color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">
+        {{ player.name_jp }}
+        {% if player.name_en %}
+            <span style="font-size: 0.6em; color: rgba(255,255,255,0.8);">({{ player.name_en }})</span>
+        {% endif %}
+    </h1>
+
+    <div style="margin: 10px 0 20px;">
+        {% if player.instagram_id %}
+            <a href="https://www.instagram.com/{{ player.instagram_id }}/" target="_blank" style="text-decoration: none; background: #E1306C; color: white; padding: 5px 10px; border-radius: 5px; margin-right: 5px; font-weight: bold; display: inline-block; margin-bottom: 5px;">
+                📸 Instagram
+            </a>
+        {% endif %}
+
+        {% if player.twitter_id %}
+            <a href="https://twitter.com/{{ player.twitter_id }}" target="_blank" style="text-decoration: none; background: #1DA1F2; color: white; padding: 5px 10px; border-radius: 5px; margin-right: 5px; font-weight: bold; display: inline-block; margin-bottom: 5px;">
+                🐦 X (Twitter)
+            </a>
+        {% endif %}
+
+        {% if player.youtube_url %}
+            <a href="{{ player.youtube_url }}" target="_blank" style="text-decoration: none; background: #FF0000; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; display: inline-block; margin-bottom: 5px;">
+                📺 YouTube
+            </a>
+        {% endif %}
+    </div>
+
+    {% if player.image %}
+        <img src="{{ player.image.url }}" style="width: 100%; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+    {% endif %}
+
+    <div style="background: #f4f4f4; padding: 20px; margin-top: 20px; border-radius: 10px;">
+        <h2>プロフィール</h2>
+        <p><strong>所属:</strong> {{ player.team }}</p>
+        <p><strong>愛称:</strong> {{ player.nickname }}</p>
+        <p><strong>私服スタイル:</strong> {{ player.fashion_style }}</p>
+        
+        <h3>📊 パラメータ</h3>
+        <p>オシャレ度: ★{{ player.param_fashion }}</p>
+        <p>SNS頻度: ★{{ player.param_sns }}</p>
+
+        <h3>👟 今日のバッシュ</h3>
+        <p>{{ player.current_shoe_model }}</p>
+        
+        <h3>💡 豆知識</h3>
+        <p>{{ player.trivia }}</p>
+    </div>
+
+    <div style="margin-top: 40px;">
+        <h3 style="border-bottom: 2px solid #ddd; padding-bottom: 10px;">📸 Tunnel Fits Gallery (私服コレクション)</h3>
+        
+        <div style="column-count: 2; column-gap: 15px;">
+            {% for fit in player.fits.all %}
+                <div style="break-inside: avoid; margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <img src="{{ fit.image.url }}" style="width: 100%; height: auto; border-radius: 5px; display: block;">
+                    {% if fit.caption %}
+                        <p style="font-size: 0.9em; color: #333; margin-top: 8px;">{{ fit.caption }}</p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>まだ画像はありません。</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>
