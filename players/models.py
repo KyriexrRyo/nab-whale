@@ -4,12 +4,24 @@ class Team(models.Model):
     name = models.CharField("チーム名", max_length=50)
     color_primary = models.CharField("メインカラー", max_length=7, default='#333333', help_text="HEXコード (例: #552583)")
     color_secondary = models.CharField("サブカラー", max_length=7, default='#eeeeee', help_text="HEXコード (例: #FDB927)")
-    
+
     def __str__(self):
         return self.name
 
 class Player(models.Model):
     name_jp = models.CharField("日本語名", max_length=100)
+    # --- ↓↓↓ ここから追加 ↓↓↓ ---
+    # APIと連携するための英語名（例: Rui Hachimura）
+    name_en = models.CharField("英語名", max_length=100, blank=True, help_text="API連携用 (例: Rui Hachimura)")
+    
+    # スタッツ（成績）
+    ppg = models.FloatField("平均得点", default=0.0)
+    rpg = models.FloatField("平均リバウンド", default=0.0)
+    apg = models.FloatField("平均アシスト", default=0.0)
+    # --- ↑↑↑ ここまで追加 ↑↑↑ ---
+
+    instagram_id = models.CharField("Instagram ID", max_length=50, blank=True, help_text="例: rui_8mura")
+    # ... (以下略、既存のコードのまま)
     instagram_id = models.CharField("Instagram ID", max_length=50, blank=True, help_text="例: rui_8mura")
     twitter_id = models.CharField("X (Twitter) ID", max_length=50, blank=True, help_text="例: rui_8mura")
     youtube_url = models.URLField("YouTube URL", blank=True, help_text="チャンネルのURL")
