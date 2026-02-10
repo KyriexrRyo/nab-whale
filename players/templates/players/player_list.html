@@ -17,11 +17,11 @@
             
             <p style="color: #666; margin-top: -10px; font-size: 0.9em;">{{ player.name_en }}</p>
 
-            <div style="background-color: #fff; padding: 10px; border-radius: 5px; margin: 10px 0; display: flex; gap: 15px; font-weight: bold;">
-                <span>得点: {{ player.ppg }}</span>
-                <span>リバウンド: {{ player.rpg }}</span>
-                <span>アシスト: {{ player.apg }}</span>
-            </div>
+            <div style="background-color: #fff; padding: 15px; border-radius: 8px; margin: 10px 0; font-weight: bold; color: #444;">
+    <span style="margin-right: 20px;">🏀 得点: {{ player.ppg }}</span>
+    <span style="margin-right: 20px;">🙌 リバウンド: {{ player.rpg }}</span>
+    <span>🤝 アシスト: {{ player.apg }}</span>
+</div>
 
             {% if player.image %}
                 <div style="margin: 10px 0;">
