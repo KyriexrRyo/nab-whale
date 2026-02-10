@@ -1,9 +1,9 @@
 from django.db import models
 
 class Team(models.Model):
-    name = models.CharField("チーム名", max_length=50)
-    color_primary = models.CharField("メインカラー", max_length=7, default='#333333', help_text="HEXコード (例: #552583)")
-    color_secondary = models.CharField("サブカラー", max_length=7, default='#eeeeee', help_text="HEXコード (例: #FDB927)")
+    name = models.CharField(max_length=100)
+    color_primary = models.CharField(max_length=7, default='#333333')   # メインカラー
+    color_secondary = models.CharField(max_length=7, default='#888888') # サブカラー
 
     def __str__(self):
         return self.name

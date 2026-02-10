@@ -3,7 +3,7 @@ from .models import Player
 
 # 一覧を表示
 def player_list(request):
-    players = Player.objects.all()
+    players = Player.objects.all().order_by('team__name', 'name_en')
     return render(request, 'players/player_list.html', {'players': players})
 
 # 詳細を表示（pkはPrimary Key=IDのこと）

@@ -1,46 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NBA Player Style</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .player-card { transition: transform 0.2s; height: 100%; }
+        .player-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .stats-badge { font-size: 0.85rem; background-color: #e9ecef; color: #495057; padding: 5px 10px; border-radius: 20px; margin-right: 5px; }
+        .team-badge { background-color: #007bff; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; }
+    </style>
 </head>
 <body>
-    <h1>NBA選手スタイル図鑑</h1>
-    
-    {% for player in players %}
-        <div style="border: 1px solid #ddd; padding: 20px; margin: 10px; border-radius: 8px; background-color: #f9f9f9;">
-            
-            <h2>
-                <a href="{% url 'player_detail' pk=player.pk %}" style="text-decoration: none; color: #333;">
-                    {{ player.name_jp }} &rarr;
-                </a>
-            </h2>
-            
-            <p style="color: #666; margin-top: -10px; font-size: 0.9em;">{{ player.name_en }}</p>
 
-            <div style="background-color: #fff; padding: 15px; border-radius: 8px; margin: 10px 0; font-weight: bold; color: #444;">
-    <span style="margin-right: 20px;">🏀 得点: {{ player.ppg }}</span>
-    <span style="margin-right: 20px;">🙌 リバウンド: {{ player.rpg }}</span>
-    <span>🤝 アシスト: {{ player.apg }}</span>
-</div>
-
-            {% if player.image %}
-                <div style="margin: 10px 0;">
-                    <img src="{{ player.image.url }}" alt="{{ player.name_jp }}" style="max-width: 300px; height: auto; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                </div>
-            {% endif %}
-
-            <p><strong>所属:</strong> {{ player.team }}</p>
-            <p><strong>バッシュ:</strong> {{ player.current_shoe_model }}</p>
-            <p><strong>オシャレ度:</strong> <span style="color: #f39c12;">★{{ player.param_fashion }}</span></p>
-            
-            <hr>
-            
-            <p style="background-color: #fff; padding: 10px; border-radius: 5px;">
-                <strong>【豆知識】</strong><br>
-                {{ player.trivia }}
-            </p>
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">🏀 NBA Style Book</a>
         </div>
-    {% endfor %}
+    </nav>
+
+    <div class="container">
+        <h2 class="mb-4 text-center">Player List <span class="text-muted fs-5">({{ players|length }} players)</span></h2>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for player in players %}
+            <div class="col">
+                <div class="card h-100 player-card shadow-sm border-0">
+                    <div class="card-img-top text-center bg-light d-flex align-items-center justify-content-center" style="height: 250px; overflow: hidden;">
+                        {% if player.image %}
+                            <img src="{{ player.image.url }}" alt="{{ player.name_jp }}" style="max-height: 100%; max-width: 100%;">
+                        {% else %}
+                            <span class="text-muted" style="font-size: 3rem;">🏀</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <span class="team-badge">{{ player.team }}</span>
+                        </div>
+                        
+                        <h5 class="card-title fw-bold">
+                            <a href="{% url 'player_detail' pk=player.pk %}" class="text-decoration-none text-dark stretched-link">
+                                {{ player.name_jp }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted small">{{ player.name_en }}</p>
+
+                        <div class="d-flex flex-wrap mt-3">
+                            <span class="stats-badge">PTS: <strong>{{ player.ppg }}</strong></span>
+                            <span class="stats-badge">REB: <strong>{{ player.rpg }}</strong></span>
+                            <span class="stats-badge">AST: <strong>{{ player.apg }}</strong></span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-white border-top-0">
+                        <small class="text-muted">オシャレ度: <span class="text-warning">★{{ player.param_fashion }}</span></small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <footer class="text-center py-4 mt-5 text-muted">
+        <small>&copy; 2026 NBA Player Style</small>
+    </footer>
 
 </body>
 </html>
