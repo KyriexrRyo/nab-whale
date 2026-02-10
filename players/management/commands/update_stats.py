@@ -9,7 +9,7 @@ class Command(BaseCommand):
         self.stdout.write("NBA.comからデータを取得中...")
 
         # 最新シーズンのデータを取得 (必要に応じて '2025-26' などに変更)
-        stats = leaguedashplayerstats.LeagueDashPlayerStats(season='2024-25')
+        stats = leaguedashplayerstats.LeagueDashPlayerStats(season='2025-26', per_mode_detailed='PerGame')
         data = stats.get_dict()
         
         # APIの結果からリストとヘッダーを取り出す

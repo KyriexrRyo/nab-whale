@@ -10,11 +10,19 @@
         <div style="border: 1px solid #ddd; padding: 20px; margin: 10px; border-radius: 8px; background-color: #f9f9f9;">
             
             <h2>
-    <a href="{% url 'player_detail' pk=player.pk %}" style="text-decoration: none; color: #333;">
-        {{ player.name_jp }} &rarr;
-    </a>
-</h2>
+                <a href="{% url 'player_detail' pk=player.pk %}" style="text-decoration: none; color: #333;">
+                    {{ player.name_jp }} &rarr;
+                </a>
+            </h2>
             
+            <p style="color: #666; margin-top: -10px; font-size: 0.9em;">{{ player.name_en }}</p>
+
+            <div style="background-color: #fff; padding: 10px; border-radius: 5px; margin: 10px 0; display: flex; gap: 15px; font-weight: bold;">
+                <span>得点: {{ player.ppg }}</span>
+                <span>リバウンド: {{ player.rpg }}</span>
+                <span>アシスト: {{ player.apg }}</span>
+            </div>
+
             {% if player.image %}
                 <div style="margin: 10px 0;">
                     <img src="{{ player.image.url }}" alt="{{ player.name_jp }}" style="max-width: 300px; height: auto; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -22,9 +30,7 @@
             {% endif %}
 
             <p><strong>所属:</strong> {{ player.team }}</p>
-            
             <p><strong>バッシュ:</strong> {{ player.current_shoe_model }}</p>
-            
             <p><strong>オシャレ度:</strong> <span style="color: #f39c12;">★{{ player.param_fashion }}</span></p>
             
             <hr>
