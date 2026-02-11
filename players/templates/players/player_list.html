@@ -30,7 +30,7 @@
                 <div class="card h-100 player-card shadow-sm border-0">
                     <div class="card-img-top text-center bg-light d-flex align-items-center justify-content-center" style="height: 250px; overflow: hidden;">
                         {% if player.image %}
-                            <img src="{{ player.image.url }}" alt="{{ player.name_jp }}" style="max-height: 100%; max-width: 100%;">
+                            <img src="{{ player.image.url }}" alt="{{ player.name_jp }}" style="max-height: 100%; max-width: 100%;" loading="lazy">
                         {% else %}
                             <span class="text-muted" style="font-size: 3rem;">🏀</span>
                         {% endif %}
