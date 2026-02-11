@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-5mrs=l!mnhpz!m36y%0_bhzkt6e&f+z@e29(**=d8o_5$!o=-v'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -120,4 +120,13 @@ STATIC_URL = 'static/'
 import os
 
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# ↓↓↓ ファイルの一番下に追加してください ↓↓↓
+
+# 画像ファイルのURL
+MEDIA_URL = '/media/'
+
+# 画像ファイルの保存場所（プロジェクト内の media フォルダ）
+import os
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -1,77 +1,97 @@
+import requests
 from django.core.management.base import BaseCommand
+from django.core.files.base import ContentFile
 from players.models import Player, Team
 from nba_api.stats.endpoints import leaguedashplayerstats
 
 class Command(BaseCommand):
-    help = '全NBA選手を自動取得・登録・更新します（2025-26シーズン）'
+    help = '全NBA選手を自動取得・更新し、画像もダウンロードします'
 
     def handle(self, *args, **options):
-        # 設定に合わせて 2025-26 シーズンを指定
         target_season = '2025-26'
-        
-        self.stdout.write(f"NBA.comから {target_season} シーズンの全データを取得中...")
+        self.stdout.write(f"NBA.comから {target_season} のデータを取得中...")
 
         try:
-            # 指定シーズンの平均スタッツを取得
+            # データ取得
             stats = leaguedashplayerstats.LeagueDashPlayerStats(
                 season=target_season, 
                 per_mode_detailed='PerGame'
             )
             data = stats.get_dict()
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f"エラー: データの取得に失敗しました。\n詳細: {e}"))
+            self.stdout.write(self.style.ERROR(f"データ取得エラー: {e}"))
             return
         
-        # データをリスト化
+        # データを扱いやすいリストに変換
         result_sets = data['resultSets'][0]
         headers = result_sets['headers']
         row_set = result_sets['rowSet']
-
-        players_data = []
-        for row in row_set:
-            players_data.append(dict(zip(headers, row)))
+        players_data = [dict(zip(headers, row)) for row in row_set]
 
         count_new = 0
         count_update = 0
+        count_img = 0
         
-        # 全選手をループ処理
-        for p_data in players_data:
-            api_name = p_data['PLAYER_NAME']        # 例: LeBron James
-            team_abbr = p_data['TEAM_ABBREVIATION'] # 例: LAL
+        total = len(players_data)
+        self.stdout.write(f"全{total}選手の処理を開始します...")
+
+        for i, p_data in enumerate(players_data):
+            api_name = p_data['PLAYER_NAME']
+            team_abbr = p_data['TEAM_ABBREVIATION']
+            player_id = p_data['PLAYER_ID'] # IDを取得（重要！）
             
-            # 1. チームの処理（なければ作る）
             if not team_abbr:
                 continue
                 
-            team_obj, created = Team.objects.get_or_create(name=team_abbr)
+            # チーム取得or作成
+            team_obj, _ = Team.objects.get_or_create(name=team_abbr)
 
-            # 2. 選手の処理
-            # update_or_create だと条件分岐が複雑になるため、
-            # 「検索して存在確認」→「あれば更新、なければ作成」という確実な手順にします。
-            
+            # 選手取得
             player = Player.objects.filter(name_en=api_name).first()
 
             if player:
-                # --- A. 既存選手の更新 ---
-                # 日本語名(name_jp)は変更せず、スタッツとチームだけ更新する
+                # 既存選手の更新
                 player.team = team_obj
                 player.ppg = p_data['PTS']
                 player.rpg = p_data['REB']
                 player.apg = p_data['AST']
-                player.save()
+                # ※ここでsave()はまだしない（画像処理の後でまとめて保存）
                 count_update += 1
             else:
-                # --- B. 新規選手の作成 ---
-                # 日本語名にはとりあえず英語名を入れておく
-                Player.objects.create(
+                # 新規作成
+                player = Player(
                     name_en=api_name,
-                    name_jp=api_name, # 初期値は英語名
+                    name_jp=api_name,
                     team=team_obj,
                     ppg=p_data['PTS'],
                     rpg=p_data['REB'],
                     apg=p_data['AST']
                 )
-                self.stdout.write(f"新規登録: {api_name}")
                 count_new += 1
 
-        self.stdout.write(self.style.SUCCESS(f'完了！ 新規登録: {count_new}人 / 更新: {count_update}人'))
+            # --- 画像ダウンロード処理 ---
+            # まだ画像がない場合のみ実行（毎回やると遅いので）
+            if not player.image:
+                # NBA公式の画像URLパターン
+                img_url = f"https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/{player_id}.png"
+                
+                try:
+                    response = requests.get(img_url, timeout=5)
+                    if response.status_code == 200:
+                        # ファイル名を決定（例: LeBron James.png）
+                        file_name = f"{api_name}.png"
+                        # 画像フィールドにバイナリデータを保存
+                        player.image.save(file_name, ContentFile(response.content), save=False)
+                        count_img += 1
+                        self.stdout.write(f"  [画像GET] {api_name}")
+                except Exception as e:
+                    self.stdout.write(f"  [画像失敗] {api_name}: {e}")
+
+            # 最後にまとめて保存
+            player.save()
+
+            # 進捗表示（50人ごと）
+            if (i + 1) % 50 == 0:
+                self.stdout.write(f"  ... {i + 1}/{total} 完了")
+
+        self.stdout.write(self.style.SUCCESS(f'完了！ 新規: {count_new} / 更新: {count_update} / 画像DL: {count_img}'))
