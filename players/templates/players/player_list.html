@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NBA Player Style</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         body { background-color: #f8f9fa; }
         .player-card { transition: transform 0.2s; height: 100%; }
@@ -17,12 +18,34 @@
 
     <nav class="navbar navbar-dark bg-dark mb-4">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#">🏀 NBA Style Book</a>
+            <a class="navbar-brand fw-bold" href="{% url 'player_list' %}">🏀 NBA Style Book</a>
         </div>
     </nav>
 
     <div class="container">
         <h2 class="mb-4 text-center">Player List <span class="text-muted fs-5">({{ players|length }} players)</span></h2>
+
+        <div class="row justify-content-center my-4">
+            <div class="col-md-8">
+                <form action="" method="get" class="d-flex">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        class="form-control form-control-lg me-2" 
+                        placeholder="選手名、バッシュ、ブランドなどで検索..." 
+                        value="{{ query|default:'' }}"
+                    >
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-search"></i> 検索
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% if query and not players %}
+            <div class="alert alert-warning text-center" role="alert">
+                「{{ query }}」に一致する選手は見つかりませんでした...😢
+            </div>
+        {% endif %}
 
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {% for player in players %}
@@ -56,7 +79,7 @@
                     </div>
                     
                     <div class="card-footer bg-white border-top-0">
-                        <small class="text-muted">オシャレ度: <span class="text-warning">★{{ player.param_fashion }}</span></small>
+                        <small class="text-muted">👟 <span class="text-dark">{{ player.shoe_model|default:"-" }}</span></small>
                     </div>
                 </div>
             </div>

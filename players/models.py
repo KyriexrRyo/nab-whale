@@ -9,48 +9,49 @@ class Team(models.Model):
         return self.name
 
 class Player(models.Model):
+    # --- 基本情報 ---
+    name_en = models.CharField("英語名", max_length=100) # API連携に必須
     name_jp = models.CharField("日本語名", max_length=100)
-    # --- ↓↓↓ ここから追加 ↓↓↓ ---
-    # APIと連携するための英語名（例: Rui Hachimura）
-    name_en = models.CharField("英語名", max_length=100, blank=True, help_text="API連携用 (例: Rui Hachimura)")
-    
-    # スタッツ（成績）
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name="所属チーム")
+    image = models.ImageField("選手画像", upload_to='player_images/', blank=True, null=True)
+
+    # --- スタッツ (APIで自動更新) ---
     ppg = models.FloatField("平均得点", default=0.0)
     rpg = models.FloatField("平均リバウンド", default=0.0)
     apg = models.FloatField("平均アシスト", default=0.0)
-    # --- ↑↑↑ ここまで追加 ↑↑↑ ---
 
-    instagram_id = models.CharField("Instagram ID", max_length=50, blank=True, help_text="例: rui_8mura")
-    # ... (以下略、既存のコードのまま)
-    instagram_id = models.CharField("Instagram ID", max_length=50, blank=True, help_text="例: rui_8mura")
-    twitter_id = models.CharField("X (Twitter) ID", max_length=50, blank=True, help_text="例: rui_8mura")
-    youtube_url = models.URLField("YouTube URL", blank=True, help_text="チャンネルのURL")
-    # ↑↑↑ ここまで追加 ↑↑↑
-    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, verbose_name="所属チーム")
-    image = models.ImageField("選手画像", upload_to='images/', blank=True, null=True)
-
-    # ファッション・ギア
-    current_shoe_model = models.CharField("着用バッシュ名", max_length=100, blank=True)
-    fashion_style = models.CharField("私服の系統", max_length=100, blank=True)
-
-    # パラメータ（5段階）
-    param_fashion = models.IntegerField("オシャレ度", default=3)
-    param_sns = models.IntegerField("SNS更新頻度", default=3)
+    # --- 選手をもっと好きになる情報 (リクエストの6項目) ---
+    # 1. バッシュ
+    shoe_model = models.CharField("着用バッシュ", max_length=100, blank=True, null=True)
     
-    # 豆知識
-    trivia = models.TextField("豆知識・裏話", blank=True)
+    # 2. ブランド
+    fashion_brands = models.TextField("よく着ているブランド", blank=True, null=True)
+    
+    # 3. Instagram (IDではなくURLの方が便利です)
+    instagram = models.URLField("Instagram URL", blank=True, null=True)
+    
+    # 4. YouTube
+    youtube = models.URLField("YouTube URL", blank=True, null=True)
+    
+    # 5. ポッドキャスト
+    podcast = models.URLField("ポッドキャスト URL", blank=True, null=True)
+
+    # 6. ウラNBA
+    ura_nba = models.TextField("ウラNBA（豆知識）", blank=True, null=True)
 
     def __str__(self):
-        return self.name_jp
-
-# --- これまでのコードの下に追加 ---
+        return self.name_en
+    # --- ↓↓↓ 一番下に追加してください ↓↓↓ ---
 
 class TunnelFit(models.Model):
-    # どの選手に紐づくか？（related_name='fits' が合言葉になります）
+    # どの選手に紐づくか？
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='fits')
     
+    # 画像ファイル
     image = models.ImageField("ギャラリー画像", upload_to='gallery/')
-    caption = models.CharField("キャプション", max_length=200, blank=True, help_text="例：2024開幕戦のセットアップ")
+    
+    # ちょっとしたメモ（例: 2024開幕戦）
+    caption = models.CharField("キャプション", max_length=200, blank=True)
 
     def __str__(self):
         return f"{self.player.name_jp}の画像"
